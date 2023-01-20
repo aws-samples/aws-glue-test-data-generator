@@ -1,0 +1,19 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "s3:GetBucket*",
+                "s3:GetObject*",
+                "s3:List*"
+            ],
+            "Resource": [
+                    "arn:aws:s3:::tdg-artefacts-**AWS_ACCOUNT_ID**",
+                    "arn:aws:s3:::tdg-artefacts-**AWS_ACCOUNT_ID**/tgd_glue_job/Config/TDG_configuration_file.yml",
+                    "arn:aws:s3:::tdg-artefacts-**AWS_ACCOUNT_ID**/tgd_glue_job/Job/TDGGlueJob.py",
+                    "arn:aws:s3:::tdg-artefacts-**AWS_ACCOUNT_ID**/tgd_lib/TestDataGeneratorLib.py"
+            ],
+            "Effect": "Allow"
+        }
+    ]
+}
