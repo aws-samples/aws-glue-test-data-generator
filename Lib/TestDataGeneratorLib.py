@@ -134,6 +134,8 @@ class TestDataGeneratorLib:
                 df = df.withColumn("tempid", col("tempid").cast(IntegerType()))
                 df = df.withColumn(f"{column_name}", expr(
                     f"date_add({column_name}, tempid)")).drop("tempid")
+            if "CastString" in descriptor and descriptor["CastString"] == 'y':
+                df = df.withColumn(f"{column_name}", col(f"{column_name}").cast(StringType()))
         return df
 
     def close_date_generator(self, df, descriptor, column_name):
@@ -143,4 +145,16 @@ class TestDataGeneratorLib:
             df = df.withColumn("tempid", col("tempid").cast(IntegerType()))
             df = df.withColumn(f"{column_name}", expr(
                 f"date_add({descriptor['StartDateColumnName']}, tempid)")).drop("tempid")
+            if "CastString" in descriptor and descriptor["CastString"] == 'y':
+                df = df.withColumn(f"{column_name}", col(f"{column_name}").cast(StringType()))
+        return df
+
+
+    def integer_generator(self, df, descriptor, column_name):
+        if "Range" in descriptor:
+            token_list = descriptor["Range"].split(",")
+            lower_limit = int(token_list[0])
+            upper_limit = int(token_list[1])
+            df = df.withColumn(column_name, lower_limit + (rand(seed=52) * (upper_limit -lower_limit)) )
+            df = df.withColumn(column_name, col(column_name).cast(IntegerType()))
         return df
