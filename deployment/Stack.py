@@ -14,9 +14,10 @@ class TDGCdkStack(cdk.Stack):
     def __init__(self, scope: cdk.App, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        artefact_bucket = s3.Bucket(self, f'tdg-artefacts-{account_id}',
-                                    bucket_name=f'tdg-artefacts-{account_id}',
-                                    versioned=True
+        artefact_bucket = s3.Bucket(self, f'tdg-artefacts-bucket-{account_id}',
+                                    bucket_name=f'tdg-artefacts-bucket-{account_id}',
+                                    versioned=True,
+                                    block_public_access=s3.BlockPublicAccess.BLOCK_ALL
                                     )
 
         s3deploy.BucketDeployment(self, "DeployTGDLib",
