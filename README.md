@@ -57,8 +57,8 @@ The Test Data Generator is based on PySpark library which is invoked through as 
 
 1. Clone the GitHub repository in your local development environment 
 2. Set the environment variable AWS_ACCOUNT to the AWS account id where you intend to deploy the Test Data Generator
-3. use aws configure to configure the AWS CLI with the access key to the AWS account
-4. if the account is not CDK bootstrapped, you need to run the following command:
+3. Use aws configure to configure the AWS CLI with the access key to the AWS account
+4. If the account is not CDK bootstrapped, you need to run the following command:
 
   `cdk bootstrap`
 
