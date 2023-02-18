@@ -39,7 +39,7 @@ The Test Data Generation Framework currently supports the following types:
 
 ## Solution Architecture
 
-![image](https://user-images.githubusercontent.com/17237690/213769977-766f98bb-f074-4e24-ab4f-64d800de990a.png)
+![image](https://user-images.githubusercontent.com/17237690/219859235-924c127e-0c2d-40d3-837b-cb5c68aa2c45.png)
 
 The Test Data Generator is based on PySpark library which is invoked through as a PySpark AWS Glue job. All configurations to the generator is configured through a YAML formatted file stored in the S3 artefact bucket. The deployment to AWS account is done by using AWS Cloud Development Kit (CDK)
 1. AWS CDK generates the CloudFromation template and deploy it in the hosting AWS Account
