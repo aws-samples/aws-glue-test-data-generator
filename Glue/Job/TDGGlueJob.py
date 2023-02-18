@@ -40,7 +40,7 @@ def _main_test_data_generator():
 
     number_of_generated_records = config_file['number_of_generated_records']
     tgd = TestDataGeneratorLib(spark,number_of_generated_records)
-    tgd_targets = TestDataGeneratorTarg(glueContext,spark)
+    tgd_targets = TestDataGeneratorTarg(glueContext)
     generated_df = spark.range(0,number_of_generated_records , 1)
     generated_df = generated_df.withColumn("id",col("id").cast(StringType())) 
     
