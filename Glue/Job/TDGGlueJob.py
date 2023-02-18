@@ -20,6 +20,16 @@ job.init(args["JOB_NAME"], args)
 ### Test Data Generator main  function
 
 def _main_test_data_generator():
+    """
+    This function is the main entry point for the Test Data Generator application. It uses the TestDataGeneratorLib and TestDataGeneratorTarg classes to generate test data and write it to output targets.
+
+    The function expects a YAML configuration file that contains the following parameters:
+    - number_of_generated_records: The number of records to generate.
+    - attributes_list: A list of attributes to be generated, along with their configuration details.
+    - target_list: A list of output targets, along with their configuration details.
+
+    :return: None
+    """
 
     s3_client = boto3.client('s3')
     bucket_name, config_file_key = args['config_file_path'].split('/', 1) 
