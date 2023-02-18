@@ -52,7 +52,7 @@ class TDGCdkStack(cdk.Stack):
                          artefact_bucket, "tgd_glue_job/Job/TDGGlueJob.py"),
                      extra_python_files=[
                             glue.Code.from_bucket(artefact_bucket, "tgd_lib/TestDataGeneratorLib.py"), 
-                            glue.Code.from_bucket(artefact_bucket, "tgd_lib/TestDataGeneratorTargets.py")
+                            glue.Code.from_bucket(artefact_bucket, "tgd_lib/TestDataGeneratorTarg.py")
                         ],
                      extra_files=[glue.Code.from_bucket(
                          artefact_bucket, "tgd_glue_job/Config/TDG_configuration_file.yml")],
