@@ -7,15 +7,15 @@ import aws_cdk.aws_iam as iam
 import json
 
 account_id = os.getenv('AWS_ACCOUNT')
-
+region = os.getenv('AWS_REGION')
 
 class TDGCdkStack(cdk.Stack):
 
     def __init__(self, scope: cdk.App, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        artefact_bucket = s3.Bucket(self, f'tdg-artefacts-bucket-{account_id}',
-                                    bucket_name=f'tdg-artefacts-bucket-{account_id}',
+        artefact_bucket = s3.Bucket(self, f'tdg-artefacts-bucket-{account_id}-{region}',
+                                    bucket_name=f'tdg-artefacts-bucket-{account_id}-{region}',
                                     versioned=True,
                                     block_public_access=s3.BlockPublicAccess.BLOCK_ALL
                                     )

@@ -12,6 +12,15 @@ generated_keys_list = []
 
 
 def helper_recursive_key_generator(level, parent, sublevel_children_number_list,number_of_generated_records):
+    """
+    Helper function for TestDataGeneratorLib.child_key_generator method. 
+    It recursively generates child keys for a given number of records.
+    Args:
+        level (int): The current level in the hierarchy.
+        parent (int): The parent id.
+        sublevel_children_number_list (list): The number of children per level.
+        number_of_generated_records (int): The total number of records to generate.
+    """    
     global tmp_id_global_counter, generated_keys_list
     for subcompcountforsublevel in range(sublevel_children_number_list[level]):
         if tmp_id_global_counter < number_of_generated_records:
@@ -24,16 +33,33 @@ def helper_recursive_key_generator(level, parent, sublevel_children_number_list,
 
 
 class TestDataGeneratorLib:
-
+    """
+    A library of methods for generating test data for use in unit tests and other development tasks.
+    """
     def __init__(
         self,
         spark: SparkSession,
         number_of_generated_records
     ) -> None:
+        """
+        Initializes the TestDataGeneratorLib instance with the specified SparkSession and the number of generated records.
+        Args:
+            spark (SparkSession): The SparkSession instance.
+            number_of_generated_records (int): The number of generated records.
+        """
         self.spark = spark
         self.number_of_generated_records= number_of_generated_records
 
     def string_generator(self, df, descriptor, column_name):
+        """
+        Generates a column of strings based on the given descriptor.
+        Args:
+            df (DataFrame): The DataFrame to which the generated column will be added.
+            descriptor (dict): A dictionary containing the parameters for generating the column.
+            column_name (str): The name of the column to be generated.
+        Returns:
+            DataFrame: The input DataFrame with the new column added.
+        """
         if "Values" in descriptor:
             lookup_data = [{"SG_LK_id": descriptor["Values"].index(
                 value), f"{column_name}":value} for value in descriptor["Values"]]
@@ -81,6 +107,15 @@ class TestDataGeneratorLib:
         return df
 
     def key_generator(self, df, descriptor, column_name):
+        """
+        Generates a column of string unique keys based on the given descriptor.
+        Args:
+            df (DataFrame): The DataFrame to which the generated column will be added.
+            descriptor (dict): A dictionary containing the parameters for generating the column.
+            column_name (str): The name of the column to be generated.
+        Returns:
+            DataFrame: The input DataFrame with the new column added.
+        """       
         if "Prefix" in descriptor:
             df = df.withColumn(f"{column_name}", concat_ws('', lit(
                 descriptor["Prefix"]), lpad(col("id"), descriptor["LeadingZeros"], "0")))
@@ -90,6 +125,15 @@ class TestDataGeneratorLib:
         return df
 
     def child_key_generator(self, df, descriptor, column_name):
+        """
+        Generates a column of string child hierarchical keys based on the given descriptor.
+        Args:
+            df (DataFrame): The DataFrame to which the generated column will be added.
+            descriptor (dict): A dictionary containing the parameters for generating the column.
+            column_name (str): The name of the column to be generated.
+        Returns:
+            DataFrame: The input DataFrame with the new column added.
+        """      
         global tmp_id_global_counter, generated_keys_list
         tmp_id_global_counter = 0
         generated_keys_list = []
@@ -113,6 +157,15 @@ class TestDataGeneratorLib:
         return df
 
     def float_generator(self, df, descriptor, column_name):
+        """
+        Generates a column of float values based on the given descriptor.
+        Args:
+            df (DataFrame): The DataFrame to which the generated column will be added.
+            descriptor (dict): A dictionary containing the parameters for generating the column.
+            column_name (str): The name of the column to be generated.
+        Returns:
+            DataFrame: The input DataFrame with the new column added.
+        """ 
         if "Expression" in descriptor:
             df = df.withColumn(f"{column_name}", expr(
                 descriptor["Expression"]))
@@ -121,6 +174,15 @@ class TestDataGeneratorLib:
         return df
 
     def date_generator(self, df, descriptor, column_name):
+        """
+        Generates a column of dates based on the given descriptor.
+        Args:
+            df (DataFrame): The DataFrame to which the generated column will be added.
+            descriptor (dict): A dictionary containing the parameters for generating the column.
+            column_name (str): The name of the column to be generated.
+        Returns:
+            DataFrame: The input DataFrame with the new column added.
+        """ 
         if "StartDate" in descriptor:
             df = df.withColumn(f"{column_name}", to_date(
                 lit(descriptor["StartDate"]), "dd/MM/yyyy"))
@@ -139,6 +201,15 @@ class TestDataGeneratorLib:
         return df
 
     def close_date_generator(self, df, descriptor, column_name):
+        """
+        Generates a column of close dates based on the given descriptor.
+        Args:
+            df (DataFrame): The DataFrame to which the generated column will be added.
+            descriptor (dict): A dictionary containing the parameters for generating the column.
+            column_name (str): The name of the column to be generated.
+        Returns:
+            DataFrame: The input DataFrame with the new column added.
+        """ 
         if "StartDateColumnName" in descriptor and "CloseDateRangeInDays" in descriptor:
             delta_days = int(descriptor["CloseDateRangeInDays"])
             df = df.withColumn("tempid", rand(seed=52) * delta_days)
@@ -151,6 +222,15 @@ class TestDataGeneratorLib:
 
 
     def integer_generator(self, df, descriptor, column_name):
+        """
+        Generates a column of integers based on the given descriptor.
+        Args:
+            df (DataFrame): The DataFrame to which the generated column will be added.
+            descriptor (dict): A dictionary containing the parameters for generating the column.
+            column_name (str): The name of the column to be generated.
+        Returns:
+            DataFrame: The input DataFrame with the new column added.
+        """ 
         if "Range" in descriptor:
             token_list = descriptor["Range"].split(",")
             lower_limit = int(token_list[0])
