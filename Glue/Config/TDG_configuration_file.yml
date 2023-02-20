@@ -65,7 +65,7 @@ attributes_list:
 target_list:
   - target: S3
     attributes:
-      BucketArn: s3://tdg-target-bucket-368463196865/generated_dataset/
+      BucketArn: s3://tdg-target-bucket/generated_dataset/
       mode: overwrite
       header: 'True'
       delimiter: ','
