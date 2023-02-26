@@ -31,7 +31,7 @@ The Test Data Generation Framework currently supports the following types:
 
 * **Internet Address Data Generator** 
 
-  This generator produces random IP address data. This can be used to generate IP address ranges for testing applications used for internet traffic monitoring or filtering.
+  This generator produces random IP addresses. This can be used to generate IP address ranges for testing applications used for internet traffic monitoring or filtering.
 
 
 * **Date Data Generator**
@@ -225,9 +225,13 @@ Descriptor of the generated record fields/columns. You can configure the followi
 
 > **DataDescriptor**:
 >  
-> >**IpRanges**: list of  ranges for IP address four numeric parts on the form  _lower value, upper value_ 
+> >**IpRanges**: list of  ranges for the IP address four numeric parts on the form of _lower value, upper value_. For example:
 >
-
+>>      - 9,10
+>>      - 1,254
+>>      - 1,128
+>>      - 2,20
+>
 
 ### target_list
 the list of targets for the generator. The generator will perform automatic data types conversion for every specified target. Currently, the generator supports the following targets:
