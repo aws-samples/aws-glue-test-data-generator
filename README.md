@@ -29,6 +29,11 @@ The Test Data Generation Framework currently supports the following types:
 
   This generator produces random float/double data from an expression. This can be used to generate float values such as salary, temperature, profit, statistical data,.. etc
 
+* **Internet Address Data Generator** 
+
+  This generator produces random IP address data. This can be used to generate IP address ranges for testing applications used for internet traffic monitoring or filtering.
+
+
 * **Date Data Generator**
 
   This generator produces random dates generator from a configurable date range.
@@ -211,6 +216,18 @@ Descriptor of the generated record fields/columns. You can configure the followi
 > >**StartDateColumnName**: _column name of the generated open date_
 >
 > >**CloseDateRangeInDays**: _maximum span form the open date in days_
+
+   * **Internet Address Data Generator**
+
+> **ColumnName**: _Column name_
+
+> **Generator**: **ip_address_generator**
+
+> **DataDescriptor**:
+>  
+> >**IpRanges**: list of  ranges for IP address four numeric parts on the form  _lower value, upper value_ 
+>
+
 
 ### target_list
 the list of targets for the generator. The generator will perform automatic data types conversion for every specified target. Currently, the generator supports the following targets:
