@@ -1,4 +1,4 @@
-number_of_generated_records: 1000000
+number_of_generated_records: 1000
 attributes_list:
   - ColumnName: PK
     Generator: key_generator
@@ -62,6 +62,15 @@ attributes_list:
     DataDescriptor:
       StartDateColumnName: InsertDate
       CloseDateRangeInDays: 365
+  - ColumnName: internet_adress
+    Generator: ip_address_generator
+    DataDescriptor:
+      IpRanges: 
+        - 9,10
+        - 1,254
+        - 1,128
+        - 2,20
+
 target_list:
   - target: S3
     attributes:
@@ -69,7 +78,3 @@ target_list:
       mode: overwrite
       header: 'True'
       delimiter: ','
-  - target: Dynamodb
-    attributes:
-      dynamodb.output.tableName: TDG_demo_v6
-      dynamodb.throughput.write.percent: '1.0'

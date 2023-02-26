@@ -49,6 +49,7 @@ class TestDataGeneratorLib:
         """
         self.spark = spark
         self.number_of_generated_records= number_of_generated_records
+        self.random_seed = 52
 
     def string_generator(self, df, descriptor, column_name):
         """
@@ -64,7 +65,7 @@ class TestDataGeneratorLib:
             lookup_data = [{"SG_LK_id": descriptor["Values"].index(
                 value), f"{column_name}":value} for value in descriptor["Values"]]
             lookup_df = self.spark.createDataFrame(lookup_data)
-            df = df.withColumn("tempid", rand(seed=52) *
+            df = df.withColumn("tempid", rand(seed=self.random_seed) *
                                (len(descriptor["Values"])))
             df = df.withColumn("tempid", col("tempid").cast(IntegerType()))
             df = df.join(lookup_df, df.tempid == lookup_df.SG_LK_id, "outer").drop(
@@ -192,7 +193,7 @@ class TestDataGeneratorLib:
                 end_date_object = datetime.strptime(
                     descriptor["EndDate"], '%d/%m/%Y')
                 delta_days = end_date_object - start_date_object
-                df = df.withColumn("tempid", rand(seed=52) * delta_days.days)
+                df = df.withColumn("tempid", rand(seed=self.random_seed) * delta_days.days)
                 df = df.withColumn("tempid", col("tempid").cast(IntegerType()))
                 df = df.withColumn(f"{column_name}", expr(
                     f"date_add({column_name}, tempid)")).drop("tempid")
@@ -212,7 +213,7 @@ class TestDataGeneratorLib:
         """ 
         if "StartDateColumnName" in descriptor and "CloseDateRangeInDays" in descriptor:
             delta_days = int(descriptor["CloseDateRangeInDays"])
-            df = df.withColumn("tempid", rand(seed=52) * delta_days)
+            df = df.withColumn("tempid", rand(seed=self.random_seed) * delta_days)
             df = df.withColumn("tempid", col("tempid").cast(IntegerType()))
             df = df.withColumn(f"{column_name}", expr(
                 f"date_add({descriptor['StartDateColumnName']}, tempid)")).drop("tempid")
@@ -231,10 +232,41 @@ class TestDataGeneratorLib:
         Returns:
             DataFrame: The input DataFrame with the new column added.
         """ 
+        if "Seed" in descriptor:
+            seed = int(descriptor["Seed"])
+        else:
+            seed = self.random_seed
+
         if "Range" in descriptor:
             token_list = descriptor["Range"].split(",")
             lower_limit = int(token_list[0])
-            upper_limit = int(token_list[1])
-            df = df.withColumn(column_name, lower_limit + (rand(seed=52) * (upper_limit -lower_limit)) )
+            upper_limit = int(token_list[1]) + 1
+            df = df.withColumn(column_name, lower_limit + (rand(seed=seed) * (upper_limit -lower_limit)) )
             df = df.withColumn(column_name, col(column_name).cast(IntegerType()))
+        return df
+
+
+    def ip_address_generator(self, df, descriptor, column_name):
+        """
+        Generates a column of strings with random internet IP address.
+        Args:
+            df (DataFrame): The DataFrame to which the generated column will be added.
+            descriptor (dict): A dictionary containing the parameters for generating the column.
+            column_name (str): The name of the column to be generated.
+        Returns:
+            DataFrame: The input DataFrame with the new column added.
+        """   
+        tmp_discriptor ={}
+        df = df.withColumn(f"{column_name}", lit(None))
+        for i in range(1,5):
+            if "IpRanges" in descriptor and len(descriptor["IpRanges"])>=i:
+                tmp_discriptor["Range"]=descriptor["IpRanges"][i-1]
+            else:
+                tmp_discriptor["Range"]="1,254"
+
+            tmp_discriptor["Seed"]=i
+            df = self.integer_generator (df,tmp_discriptor,"temp_ip_gen_col")
+            separtor = '' if i ==1 else '.'
+            df = df.withColumn(f"{column_name}", concat_ws(separtor, col(f"{column_name}"),col("temp_ip_gen_col")))
+            df = df.drop(col('temp_ip_gen_col'))
         return df
