@@ -3,6 +3,11 @@ Test data generation plays a critical role in evaluating system performance, val
 
 The AWS Glue Test Data Generator provides a configurable framework for Test Data Generation using AWS Glue Pyspark serverless Jobs. The required test data description is fully configurable through a YAML configuration file.
 
+## Code Repository on Github
+The source code and depolymen instruction are accessible through this link: [Github Code Repository](https://github.com/aws-samples/aws-glue-test-data-generator)
+
+## Supported data types
+
 The Test Data Generation Framework currently supports the following types:
 
 * **Unique Key Generator**
