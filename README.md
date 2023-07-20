@@ -1,4 +1,4 @@
-## AWS Glue Test Data Generator
+## AWS Glue Test Data Generator for S3 Data Lakes and DynamoDB
 Test data generation plays a critical role in evaluating system performance, validating accuracy, bug identification, enhancing reliability, assessing scalability, ensuring regulatory compliance, training machine learning models, and supporting CI/CD processes. It enables the discovery of potential issues and ensures that systems operate as intended across diverse scenarios.
 
 The AWS Glue Test Data Generator provides a configurable framework for Test Data Generation using AWS Glue Pyspark serverless Jobs. The required test data description is fully configurable through a YAML configuration file.
