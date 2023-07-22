@@ -6,63 +6,93 @@ import aws_cdk.aws_glue_alpha as glue
 import aws_cdk.aws_iam as iam
 import json
 
-account_id = os.getenv('AWS_ACCOUNT')
-region = os.getenv('AWS_REGION')
+account_id = os.getenv("AWS_ACCOUNT")
+region = os.getenv("AWS_REGION")
+
+if account_id == None:
+    print(
+        "Error: envrionmnet variable AWS_ACCOUNT is not set. Please set AWS_ACCOUNT OS env variable and rerun!"
+    )
+    exit(1)
+if region == None:
+    print(
+        "Error: envrionmnet variable AWS_REGION is not set. Please set AWS_REGION  OS env variable and rerun!"
+    )
+    exit(1)
+
 
 class TDGCdkStack(cdk.Stack):
-
     def __init__(self, scope: cdk.App, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        artefact_bucket = s3.Bucket(self, f'tdg-artefacts-bucket-{account_id}-{region}',
-                                    bucket_name=f'tdg-artefacts-bucket-{account_id}-{region}',
-                                    versioned=True,
-                                    block_public_access=s3.BlockPublicAccess.BLOCK_ALL
-                                    )
+        artefact_bucket = s3.Bucket(
+            self,
+            f"tdg-artefacts-bucket-{account_id}-{region}",
+            bucket_name=f"tdg-artefacts-bucket-{account_id}-{region}",
+            versioned=True,
+            block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
+        )
 
-        s3deploy.BucketDeployment(self, "DeployTGDLib",
-                                  sources=[s3deploy.Source.asset("./Lib")],
-                                  destination_bucket=artefact_bucket,
-                                  destination_key_prefix="tgd_lib/"
-                                  )
+        s3deploy.BucketDeployment(
+            self,
+            "DeployTGDLib",
+            sources=[s3deploy.Source.asset("./Lib")],
+            destination_bucket=artefact_bucket,
+            destination_key_prefix="tgd_lib/",
+        )
 
-        s3deploy.BucketDeployment(self, "DeployGlueJob",
-                                  sources=[s3deploy.Source.asset("./Glue")],
-                                  destination_bucket=artefact_bucket,
-                                  destination_key_prefix="tgd_glue_job/"
-                                  )
+        s3deploy.BucketDeployment(
+            self,
+            "DeployGlueJob",
+            sources=[s3deploy.Source.asset("./Glue")],
+            destination_bucket=artefact_bucket,
+            destination_key_prefix="tgd_glue_job/",
+        )
 
         iam_role_name = "TDG_Glue_Role"
-        tgd_glue_role = iam.Role(self, "TDG_Glue_Role",
-                                 assumed_by=iam.ServicePrincipal(
-                                     "glue.amazonaws.com")
-                                 )
+        tgd_glue_role = iam.Role(
+            self, "TDG_Glue_Role", assumed_by=iam.ServicePrincipal("glue.amazonaws.com")
+        )
         tgd_glue_role.add_managed_policy(
-            iam.ManagedPolicy.from_aws_managed_policy_name('AmazonS3FullAccess'))
+            iam.ManagedPolicy.from_aws_managed_policy_name("AmazonS3FullAccess")
+        )
         tgd_glue_role.add_managed_policy(
-            iam.ManagedPolicy.from_aws_managed_policy_name('AmazonDynamoDBFullAccess'))
+            iam.ManagedPolicy.from_aws_managed_policy_name("AmazonDynamoDBFullAccess")
+        )
 
         self.create_managed_policies(f"{iam_role_name}_policy", tgd_glue_role)
 
-        glue.Job(self, "TDGPysparkJOb",
-                 executable=glue.JobExecutable.python_etl(
-                     glue_version=glue.GlueVersion.V3_0,
-                     python_version=glue.PythonVersion.THREE,
-                     script=glue.Code.from_bucket(
-                         artefact_bucket, "tgd_glue_job/Job/TDGGlueJob.py"),
-                     extra_python_files=[
-                            glue.Code.from_bucket(artefact_bucket, "tgd_lib/TestDataGeneratorLib.py"), 
-                            glue.Code.from_bucket(artefact_bucket, "tgd_lib/TestDataGeneratorTarg.py")
-                        ],
-                     extra_files=[glue.Code.from_bucket(
-                         artefact_bucket, "tgd_glue_job/Config/TDG_configuration_file.yml")],
-                 ),
-                 job_name="TestDataGeneratorJob",
-                 description="Test Data Generator main Glue job",
-                 default_arguments={
-                     "--config_file_path": f"{artefact_bucket.bucket_name}/tgd_glue_job/Config/TDG_configuration_file.yml"},
-                 role=tgd_glue_role
-                 )
+        glue.Job(
+            self,
+            "TDGPysparkJOb",
+            executable=glue.JobExecutable.python_etl(
+                glue_version=glue.GlueVersion.of("4.0"),
+                python_version=glue.PythonVersion.THREE,
+                script=glue.Code.from_bucket(
+                    artefact_bucket, "tgd_glue_job/Job/TDGGlueJob.py"
+                ),
+                extra_python_files=[
+                    glue.Code.from_bucket(
+                        artefact_bucket, "tgd_lib/TestDataGeneratorLib.py"
+                    ),
+                    glue.Code.from_bucket(
+                        artefact_bucket, "tgd_lib/TestDataGeneratorTarg.py"
+                    ),
+                ],
+                extra_files=[
+                    glue.Code.from_bucket(
+                        artefact_bucket,
+                        "tgd_glue_job/Config/TDG_configuration_file.yml",
+                    )
+                ],
+            ),
+            job_name="TestDataGeneratorJob",
+            description="Test Data Generator main Glue job",
+            default_arguments={
+                "--config_file_path": f"{artefact_bucket.bucket_name}/tgd_glue_job/Config/TDG_configuration_file.yml"
+            },
+            role=tgd_glue_role,
+        )
 
     def create_managed_policies(self, dir, role, role_name=None) -> iam.Role:
         dir = f"./deployment/iam_policies/{dir}/"
@@ -79,10 +109,12 @@ class TDGCdkStack(cdk.Stack):
 
                     data = json.loads(data)
                     policy = iam.PolicyDocument.from_json(data)
-                    policy = iam.ManagedPolicy(self,
-                                               policy_name + "pol",
-                                               managed_policy_name=logical_policy_name,
-                                               document=policy)
+                    policy = iam.ManagedPolicy(
+                        self,
+                        policy_name + "pol",
+                        managed_policy_name=logical_policy_name,
+                        document=policy,
+                    )
 
             policy.attach_to_role(role)
 
