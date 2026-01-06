@@ -59,7 +59,7 @@ def helper_recursive_key_generator(
                 )
 
 
-class TestDataGeneratorLib:
+class DataGeneratorLib:
     """
     A library of methods for generating test data for use in unit tests and other development tasks.
     """

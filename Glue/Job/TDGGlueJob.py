@@ -6,8 +6,8 @@ from awsglue.job import Job
 from pyspark.sql.types import StringType
 from pyspark.sql.functions import col
 import boto3, yaml
-from TestDataGeneratorLib import TestDataGeneratorLib
-from TestDataGeneratorTarg import TestDataGeneratorTarg
+from TestDataGeneratorLib import DataGeneratorLib
+from TestDataGeneratorTarg import DataGeneratorTarg
 
 # Initialization
 args = getResolvedOptions(sys.argv, ["JOB_NAME", "config_file_path"])
@@ -40,8 +40,8 @@ def _main_test_data_generator():
     config_file = yaml.safe_load(response["Body"])
 
     number_of_generated_records = config_file["number_of_generated_records"]
-    tgd = TestDataGeneratorLib(spark, number_of_generated_records)
-    tgd_targets = TestDataGeneratorTarg(glueContext)
+    tgd = DataGeneratorLib(spark, number_of_generated_records)
+    tgd_targets = DataGeneratorTarg(glueContext)
     generated_df = spark.range(0, number_of_generated_records, 1)
     generated_df = generated_df.withColumn("id", col("id").cast(StringType()))
 
