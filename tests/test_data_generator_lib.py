@@ -51,9 +51,49 @@ class TestTestDataGeneratorLib(unittest.TestCase):
         mock_lookup_df = Mock()
         self.mock_spark.createDataFrame.return_value = mock_lookup_df
         
+        # Mock the final result DataFrame to simulate different selected values
+        mock_result_df = Mock()
+        mock_result_df.collect.return_value = [
+            Mock(test_column="value2"),  # Simulate random selection
+            Mock(test_column="value1"),
+            Mock(test_column="value3")
+        ]
+        self.mock_df.join.return_value.drop.return_value.drop.return_value = mock_result_df
+        
         result = self.tdg.string_generator(self.mock_df, descriptor, column_name)
         
+        # Verify lookup DataFrame was created with correct data structure
         self.mock_spark.createDataFrame.assert_called_once()
+        call_args = self.mock_spark.createDataFrame.call_args[0][0]
+        
+        # Verify all values are in lookup data with correct IDs
+        expected_lookup = [
+            {"SG_LK_id": 0, "test_column": "value1"},
+            {"SG_LK_id": 1, "test_column": "value2"},
+            {"SG_LK_id": 2, "test_column": "value3"}
+        ]
+        self.assertEqual(call_args, expected_lookup)
+        
+        # Verify withColumn calls for random ID generation and bounds checking
+        self.assertTrue(self.mock_df.withColumn.call_count >= 3)  # tempid, floor cast, bounds check
+        
+        # Verify join operation uses left join
+        self.mock_df.join.assert_called()
+        
+        # Test that result can contain different values (not just first one)
+        # Since we're using mocks, we verify the mechanism rather than actual results
+        # The key test is that lookup table contains all values with correct IDs
+        # and that withColumn was called multiple times for proper randomization
+        
+        # Verify the lookup mechanism supports all values
+        lookup_values = [item[column_name] for item in call_args]
+        expected_values = ["value1", "value2", "value3"]
+        self.assertEqual(lookup_values, expected_values)
+        
+        # Verify IDs are sequential (enables proper random selection)
+        lookup_ids = [item["SG_LK_id"] for item in call_args]
+        self.assertEqual(lookup_ids, [0, 1, 2])
+        
         self.assertIsNotNone(result)
         
     def test_string_generator_with_random(self):

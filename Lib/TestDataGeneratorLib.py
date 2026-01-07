@@ -92,11 +92,14 @@ class DataGeneratorLib:
             ]
             lookup_df = self.spark.createDataFrame(lookup_data)
             df = df.withColumn(
-                "tempid", rand(seed=self.random_seed) * (len(descriptor["Values"]))
+                "tempid", (rand(seed=self.random_seed) * len(descriptor["Values"]))
             )
-            df = df.withColumn("tempid", col("tempid").cast(IntegerType()))
+            df = df.withColumn("tempid", expr("floor(tempid)").cast(IntegerType()))
+            # Ensure tempid is within bounds [0, len-1]
+            df = df.withColumn("tempid", 
+                expr(f"CASE WHEN tempid >= {len(descriptor['Values'])} THEN {len(descriptor['Values'])-1} ELSE tempid END"))
             df = (
-                df.join(lookup_df, df.tempid == lookup_df.SG_LK_id, "outer")
+                df.join(lookup_df, df.tempid == lookup_df.SG_LK_id, "left")
                 .drop(col("tempid"))
                 .drop(col("SG_LK_id"))
             )
