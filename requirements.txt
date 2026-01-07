@@ -2,7 +2,7 @@ aws-cdk-lib==2.88.0
 constructs>=10.0.0,<11.0.0
 aws_cdk.aws_glue_alpha
 
-PyYAML~=5.3
+PyYAML~=6.0.3
 pyspark~=3.3.0
 
 # Test dependencies

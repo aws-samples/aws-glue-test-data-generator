@@ -65,24 +65,75 @@ The Test Data Generator is based on PySpark library which is invoked through as 
 
 3. The TDG PySpark glue Job is invoked to generate the test data.
 
-## Deployment
+## Deployment Options
 
-1. Clone the GitHub repository in your local development environment 
+You can deploy the AWS Glue Test Data Generator using either **AWS CDK** or **Terraform**.
 
+### Option 1: AWS CDK Deployment
+
+1. Clone the GitHub repository in your local development environment
 2. Set the following environment variables:
-
- `AWS_ACCOUNT` to the AWS account id where you intend to deploy the Test Data Generator
- 
- `AWS_REGION` to the AWS region id where you intend to deploy the Test Data Generator
- 
+   - `AWS_ACCOUNT` to the AWS account id where you intend to deploy the Test Data Generator
+   - `AWS_REGION` to the AWS region id where you intend to deploy the Test Data Generator
 3. Use aws configure to configure the AWS CLI with the access key to the AWS account
 4. If the account is not CDK bootstrapped, you need to run the following command:
+   ```bash
+   cdk bootstrap
+   ```
+5. Open a terminal in the workspace path and run the following CDK command to deploy the solution:
+   ```bash
+   cd <workspace-path>/AWSGluePysparkTDG
+   cdk deploy
+   ```
 
-  `cdk bootstrap`
+### Option 2: Terraform Deployment ⭐ **Recommended**
 
-5. open a terminal in the workspace path and run the following CDK command to deploy the solution
+#### Prerequisites
+1. **Install Terraform** (>= 1.0):
+   ```bash
+   # Windows: Download from https://www.terraform.io/downloads.html
+   # macOS: brew install terraform
+   # Linux: sudo apt-get install terraform
+   ```
 
-  `$<workspace-path>/AWSGluePysparkTDG> cdk deploy`
+2. **Configure AWS CLI**:
+   ```bash
+   aws configure
+   # Enter your AWS Access Key ID, Secret Access Key, Region, and output format
+   ```
+
+#### Deploy with Terraform
+
+1. **Initialize Terraform**:
+   ```bash
+   cd terraform
+   terraform init
+   ```
+
+2. **Configure variables (Optional)**:
+   ```bash
+   cp terraform.tfvars.example terraform.tfvars
+   # Edit terraform.tfvars with your preferred settings
+   ```
+
+3. **Plan the deployment**:
+   ```bash
+   terraform plan
+   ```
+
+4. **Apply the deployment**:
+   ```bash
+   terraform apply
+   # Type 'yes' when prompted to confirm
+   ```
+
+5. **Verify deployment**:
+   After successful deployment, you'll see outputs including:
+   - S3 bucket name for artifacts
+   - Glue job name and ARN
+   - IAM role details
+   - Configuration file path
+
 
 ## Configuration
 
