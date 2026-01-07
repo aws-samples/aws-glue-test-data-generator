@@ -1,7 +1,7 @@
 from awsglue.dynamicframe import DynamicFrame
 
 
-class TestDataGeneratorTarg:
+class DataGeneratorTarg:
     """
     A class that provides methods to write data to different data storage services, such as S3 and DynamoDB, using the GlueContext provided.
 

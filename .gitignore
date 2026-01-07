@@ -1,6 +1,19 @@
 example.json
 example.yaml
 cdk.out/
+
+# Terraform
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+terraform.tfvars
+*.tfplan
+*.tfstate
+terraform.exe
+terraform.zip
+*.zip
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
