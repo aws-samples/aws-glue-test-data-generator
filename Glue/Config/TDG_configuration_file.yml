@@ -125,12 +125,12 @@ attributes_list:
 target_list:
   - target: S3
     attributes:
-      BucketURI: s3://tmp-bucket-589233509232/generated_dataset_json/
+      BucketURI: s3://tdg-target-bucket/generated_dataset_json/
       mode: overwrite
       header: 'True'
       delimiter: ','
   - target: S3
     attributes:
-      BucketURI: s3://tmp-bucket-589233509232/generated_dataset_parquet/
+      BucketURI: s3://tdg-target-bucket/generated_dataset_parquet/
       mode: overwrite
       format: parquet
