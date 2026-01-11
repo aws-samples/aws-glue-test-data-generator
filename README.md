@@ -90,7 +90,7 @@ You can deploy the AWS Glue Test Data Generator using either **AWS CDK** or **Te
    cdk deploy
    ```
 
-### Option 2: Terraform Deployment ⭐ **Recommended**
+### Option 2: Terraform Deployment 
 
 #### Prerequisites
 1. **Install Terraform** (>= 1.0):
