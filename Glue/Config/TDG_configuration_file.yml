@@ -70,11 +70,67 @@ attributes_list:
         - 1,254
         - 1,128
         - 2,20
+  - ColumnName: user_profile
+    Generator: json_generator
+    DataDescriptor:
+      Schema:
+        user_id: "USR001"
+        name: "John Doe"
+        email: "john.doe@example.com"
+        age: 25
+        balance: 1500.50
+        status: "active"
+        tags: ["premium", "verified"]
+        address:
+          street: "123 Main St"
+          city: "New York"
+          zip: 10001
+        orders:
+          - order_id: "ORD001"
+            amount: 99.99
+          - order_id: "ORD002"
+            amount: 149.50
+        contacts:
+          - type: "email"
+            value: "john@example.com"
+            verified: true
+          - type: "phone"
+            value: "+1234567890"
+            verified: false
+      FieldConfigs:
+        user_id:
+          Generator: key_generator
+          DataDescriptor:
+            Prefix: "USR"
+            LeadingZeros: 6
+        name:
+          Generator: string_generator
+          DataDescriptor:
+            Values:
+              - "John Smith"
+              - "Jane Doe"
+              - "Mike Johnson"
+        age:
+          Generator: integer_generator
+          DataDescriptor:
+            Range: "18,65"
+        status:
+          Generator: string_generator
+          DataDescriptor:
+            Values:
+              - "active"
+              - "inactive"
+              - "suspended"
 
 target_list:
   - target: S3
     attributes:
-      BucketURI: s3://tdg-target-bucket/generated_dataset/
+      BucketURI: s3://tmp-bucket-589233509232/generated_dataset_json/
       mode: overwrite
       header: 'True'
       delimiter: ','
+  - target: S3
+    attributes:
+      BucketURI: s3://tmp-bucket-589233509232/generated_dataset_parquet/
+      mode: overwrite
+      format: parquet

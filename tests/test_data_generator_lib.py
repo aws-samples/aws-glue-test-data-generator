@@ -219,6 +219,119 @@ class TestTestDataGeneratorLib(unittest.TestCase):
         result = self.tdg.ip_address_generator(self.mock_df, descriptor, column_name)
         
         self.assertIsNotNone(result)
+        
+    def test_json_generator_with_schema_only(self):
+        """Test json_generator with schema only (no field configs)."""
+        descriptor = {
+            "Schema": {
+                "user_id": "USR001",
+                "name": "John Doe",
+                "age": 25,
+                "balance": 1500.50,
+                "active": True
+            }
+        }
+        column_name = "json_data"
+        
+        result = self.tdg.json_generator(self.mock_df, descriptor, column_name)
+        
+        self.assertIsNotNone(result)
+        
+    def test_json_generator_with_field_configs(self):
+        """Test json_generator with field configurations."""
+        descriptor = {
+            "Schema": {
+                "user_id": "USR001",
+                "name": "John Doe",
+                "age": 25,
+                "status": "active"
+            },
+            "FieldConfigs": {
+                "user_id": {
+                    "Generator": "key_generator",
+                    "DataDescriptor": {
+                        "Prefix": "USR",
+                        "LeadingZeros": 6
+                    }
+                },
+                "age": {
+                    "Generator": "integer_generator",
+                    "DataDescriptor": {
+                        "Range": "18,65"
+                    }
+                },
+                "status": {
+                    "Generator": "string_generator",
+                    "DataDescriptor": {
+                        "Values": ["active", "inactive", "suspended"]
+                    }
+                }
+            }
+        }
+        column_name = "json_data"
+        
+        result = self.tdg.json_generator(self.mock_df, descriptor, column_name)
+        
+        self.assertIsNotNone(result)
+        
+    def test_json_generator_missing_schema(self):
+        """Test json_generator raises error when schema is missing."""
+        descriptor = {
+            "FieldConfigs": {}
+        }
+        column_name = "json_data"
+        
+        with self.assertRaises(ValueError) as context:
+            self.tdg.json_generator(self.mock_df, descriptor, column_name)
+            
+        self.assertIn("Schema is required", str(context.exception))
+        
+    def test_json_generator_with_arrays(self):
+        """Test json_generator with array fields."""
+        descriptor = {
+            "Schema": {
+                "tags": ["premium", "verified"],
+                "numbers": [1, 2, 3]
+            }
+        }
+        column_name = "json_data"
+        
+        result = self.tdg.json_generator(self.mock_df, descriptor, column_name)
+        
+        self.assertIsNotNone(result)
+        
+    def test_json_generator_with_nested_structs(self):
+        """Test json_generator with nested struct fields."""
+        descriptor = {
+            "Schema": {
+                "address": {
+                    "street": "123 Main St",
+                    "city": "New York",
+                    "zip": 10001
+                }
+            }
+        }
+        column_name = "json_data"
+        
+        result = self.tdg.json_generator(self.mock_df, descriptor, column_name)
+        
+        self.assertIsNotNone(result)
+        
+    def test_json_generator_with_array_of_structs(self):
+        """Test json_generator with array of struct fields."""
+        descriptor = {
+            "Schema": {
+                "orders": [
+                    {"order_id": "ORD001", "amount": 99.99},
+                    {"order_id": "ORD002", "amount": 149.50}
+                ]
+            }
+        }
+        column_name = "json_data"
+        
+        result = self.tdg.json_generator(self.mock_df, descriptor, column_name)
+        
+        self.assertIsNotNone(result)
 
 
 class TestHelperFunctions(unittest.TestCase):

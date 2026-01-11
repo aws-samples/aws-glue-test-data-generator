@@ -20,8 +20,12 @@ from pyspark.sql.functions import (
     expr,
     to_date,
     date_add,
+    to_json,
+    struct,
+    array,
 )
 import string
+import json
 from datetime import datetime
 
 
@@ -359,4 +363,74 @@ class DataGeneratorLib:
                 concat_ws(separtor, col(f"{column_name}"), col("temp_ip_gen_col")),
             )
             df = df.drop(col("temp_ip_gen_col"))
+        return df
+
+    def json_generator(self, df, descriptor, column_name):
+        """
+        Generates a column of JSON strings based on a sample schema and field generators.
+        Args:
+            df (DataFrame): The DataFrame to which the generated column will be added.
+            descriptor (dict): A dictionary containing the sample JSON schema and field configurations.
+            column_name (str): The name of the column to be generated.
+        Returns:
+            DataFrame: The input DataFrame with the new column added.
+        """
+        if "Schema" not in descriptor:
+            raise ValueError("Schema is required for json_generator")
+        
+        schema = descriptor["Schema"]
+        field_configs = descriptor.get("FieldConfigs", {})
+        
+        # Generate individual fields based on the schema
+        temp_columns = []
+        for field_name, field_value in schema.items():
+            temp_col_name = f"json_temp_{field_name}"
+            temp_columns.append(temp_col_name)
+            
+            if field_name in field_configs:
+                # Use configured generator for this field
+                config = field_configs[field_name]
+                generator_method = getattr(self, config["Generator"])
+                df = generator_method(df, config["DataDescriptor"], temp_col_name)
+            else:
+                # Handle different data types
+                df = self._generate_field_value(df, field_value, temp_col_name)
+        
+        # Create struct and convert to JSON
+        struct_fields = [col(temp_col).alias(field_name) for temp_col, field_name in zip(temp_columns, schema.keys())]
+        df = df.withColumn(column_name, to_json(struct(*struct_fields)))
+        
+        # Clean up temporary columns
+        for temp_col in temp_columns:
+            df = df.drop(col(temp_col))
+        
+        return df
+    
+    def _generate_field_value(self, df, field_value, temp_col_name):
+        """Helper method to generate field values based on type"""
+        if isinstance(field_value, list):
+            # Handle arrays
+            if len(field_value) > 0:
+                array_elements = []
+                for item in field_value:
+                    if isinstance(item, dict):
+                        # Nested struct in array
+                        nested_fields = []
+                        for k, v in item.items():
+                            nested_fields.append(lit(v).alias(k))
+                        array_elements.append(struct(*nested_fields))
+                    else:
+                        array_elements.append(lit(item))
+                df = df.withColumn(temp_col_name, array(*array_elements))
+            else:
+                df = df.withColumn(temp_col_name, array())
+        elif isinstance(field_value, dict):
+            # Handle nested structs
+            nested_fields = []
+            for k, v in field_value.items():
+                nested_fields.append(lit(v).alias(k))
+            df = df.withColumn(temp_col_name, struct(*nested_fields))
+        else:
+            # Handle primitive types
+            df = df.withColumn(temp_col_name, lit(field_value))
         return df
