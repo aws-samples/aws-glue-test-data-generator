@@ -40,6 +40,10 @@ The Test Data Generation Framework currently supports the following types:
 
   This generator produces random IP addresses. This can be used to generate IP address ranges for testing applications used for internet traffic monitoring or filtering.
 
+* **JSON Data Generator**
+
+  This generator produces JSON documents based on a sample schema and configurable field generators. You can provide a sample JSON structure and configure how each field should be generated using any of the other available generators. Supports arrays, nested objects, and arrays of objects.
+
 
 * **Date Data Generator**
 
@@ -86,7 +90,7 @@ You can deploy the AWS Glue Test Data Generator using either **AWS CDK** or **Te
    cdk deploy
    ```
 
-### Option 2: Terraform Deployment ⭐ **Recommended**
+### Option 2: Terraform Deployment 
 
 #### Prerequisites
 1. **Install Terraform** (>= 1.0):
@@ -291,6 +295,52 @@ Descriptor of the generated record fields/columns. You can configure the followi
 >>      - 2,20
 >
 
+   * **JSON Data Generator**
+
+> **ColumnName**: _Column name_
+
+> **Generator**: **json_generator**
+
+> **DataDescriptor**:
+>  
+> >**Schema**: _Sample JSON object that defines the structure and field names_
+>
+> >**FieldConfigs**: _(optional) Configuration for specific fields using other generators. If not specified, sample values from Schema are used_
+>
+> > Example:
+> >
+> >     Schema:
+> >       user_id: "USR001"
+> >       name: "John Doe"
+> >       age: 25
+> >       status: "active"
+> >       tags: ["premium", "verified"]
+> >       address:
+> >         street: "123 Main St"
+> >         city: "New York"
+> >         zip: 10001
+> >       orders:
+> >         - order_id: "ORD001"
+> >           amount: 99.99
+> >         - order_id: "ORD002"
+> >           amount: 149.50
+> >     FieldConfigs:
+> >       user_id:
+> >         Generator: key_generator
+> >         DataDescriptor:
+> >           Prefix: "USR"
+> >           LeadingZeros: 6
+> >       age:
+> >         Generator: integer_generator
+> >         DataDescriptor:
+> >           Range: "18,65"
+> >       status:
+> >         Generator: string_generator
+> >         DataDescriptor:
+> >           Values:
+> >             - "active"
+> >             - "inactive"
+
 ### target_list
 the list of targets for the generator. The generator will perform automatic data types conversion for every specified target. Currently, the generator supports the following targets:
 
@@ -307,6 +357,8 @@ the list of targets for the generator. The generator will perform automatic data
 >>**header**: _include header in the generated data (True, Flase)_
 >
 >>**delimiter**: _CSV file delimeter_
+>
+>>**format**: _(optional) file format (csv, parquet). Defaults to csv_
 
 * DynamoDB tables 
 >

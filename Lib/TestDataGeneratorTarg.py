@@ -36,13 +36,19 @@ class DataGeneratorTarg:
                 - 'delimiter' (str): The delimiter to be used in the CSV file.
                 - 'BucketURI' (str): The URI (Amazon Resource Name) of the target S3 bucket.
                 - 'mode' (str): The write mode, e.g., 'overwrite' or 'append'.
+                - 'format' (str): The file format, e.g., 'csv' or 'parquet'.
 
         Note:
-            The DataFrame will be written as a CSV file to the specified S3 bucket.
+            The DataFrame will be written as CSV or Parquet file to the specified S3 bucket.
         """
-        df.write.options(
-            header=descriptor["header"], delimiter=descriptor["delimiter"]
-        ).csv(descriptor["BucketURI"], mode=descriptor["mode"])
+        file_format = descriptor.get("format", "csv")
+        
+        if file_format.lower() == "parquet":
+            df.write.parquet(descriptor["BucketURI"], mode=descriptor["mode"])
+        else:
+            df.write.options(
+                header=descriptor["header"], delimiter=descriptor["delimiter"]
+            ).csv(descriptor["BucketURI"], mode=descriptor["mode"])
 
     def Dynamodb(self, df, descriptor):
         """
