@@ -374,7 +374,10 @@ the list of targets for the generator. The generator will perform automatic data
 From the AWS Glue Console:
 1. Navigate to **Data Integration and ETL>AWS Glue Studio]>Jobs**
 2. Select the **TestDataGeneratorJob **job and press** Run Job**
-3. Once the job completes successfully, check for the generated data in the configured targets.
+3. Optionally, you can provide a YAML configuration directly as a job parameter:
+   - Add `--config_yaml` as a job parameter with your YAML configuration as the value
+   - If not provided, the job will use the default configuration file from S3
+4. Once the job completes successfully, check for the generated data in the configured targets.
 
 
 

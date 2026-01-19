@@ -131,3 +131,8 @@ cdk.context.json
 .lambda_dependencies/
 .cfn_templates/
 synth.yaml
+
+# Bedrock AgentCore
+tdg_agent\.bedrock_agentcore.yaml
+tdg_agent\.dockerignore
+tdg_agent\.bedrock_agentcore\tdg_agent
